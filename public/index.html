@@ -42,12 +42,11 @@ const clock = new THREE.Clock();
 // Load GLB
 const loader = new GLTFLoader();
 loader.load(
-  '/models/jump2.glb', // path to your model
+  '/models/jump2.glb', // path relative to public/
   (gltf) => {
     const model = gltf.scene;
     scene.add(model);
 
-    // Center and scale
     const box = new THREE.Box3().setFromObject(model);
     const size = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
@@ -56,11 +55,9 @@ loader.load(
     const maxDim = Math.max(size.x, size.y, size.z);
     model.scale.multiplyScalar(2.0 / maxDim);
 
-    // Camera setup
     camera.position.set(0, size.y/2, maxDim*2);
     camera.lookAt(0,0,0);
 
-    // Play animations
     if (gltf.animations.length > 0) {
       mixer = new THREE.AnimationMixer(model);
       gltf.animations.forEach(clip => mixer.clipAction(clip).play());
