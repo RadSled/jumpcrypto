@@ -4,24 +4,25 @@
 <meta charset="UTF-8">
 <title>Jump2 3D Animation</title>
 <style>
-  body { margin: 0; overflow: hidden; }
-  canvas { display: block; width: 100%; height: 100%; }
+  html, body { margin:0; padding:0; height:100%; overflow:hidden; }
+  #three-container { width:100%; height:100%; }
 </style>
 </head>
 <body>
-<div id="container"></div>
+<div id="three-container"></div>
 
-<script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.156.1/build/three.module.js';
-import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.156.1/examples/jsm/loaders/GLTFLoader.js';
-import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.156.1/examples/jsm/controls/OrbitControls.js';
+<!-- Load Three.js and extras as plain scripts -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.156.1/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.156.1/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.156.1/examples/js/controls/OrbitControls.js"></script>
 
-const container = document.getElementById('container');
+<script>
+const container = document.getElementById('three-container');
 const scene = new THREE.Scene();
 
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(45, container.clientWidth/container.clientHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
-renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setSize(container.clientWidth, container.clientHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
 container.appendChild(renderer.domElement);
 
@@ -32,21 +33,22 @@ dirLight.position.set(3, 10, 10);
 scene.add(dirLight);
 
 // Controls
-const controls = new OrbitControls(camera, renderer.domElement);
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 
+// Animation
 let mixer;
 const clock = new THREE.Clock();
 
-// Load GLB from public folder
-const loader = new GLTFLoader();
+// Load GLB model
+const loader = new THREE.GLTFLoader();
 loader.load(
-  '/models/jump2.glb', // Vercel serves this from public/models
+  '/models/jump2.glb', // relative to public/
   function(gltf) {
     const model = gltf.scene;
     scene.add(model);
 
-    // Center & scale model
+    // Center and scale
     const box = new THREE.Box3().setFromObject(model);
     const size = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
@@ -55,30 +57,32 @@ loader.load(
     const maxDim = Math.max(size.x, size.y, size.z);
     model.scale.multiplyScalar(2.0 / maxDim);
 
-    // Camera position
+    // Camera
     camera.position.set(0, size.y/2, maxDim*2);
     camera.lookAt(0,0,0);
 
-    // Animation mixer
-    if(gltf.animations.length>0){
+    // Play animations
+    if (gltf.animations.length > 0) {
       mixer = new THREE.AnimationMixer(model);
       gltf.animations.forEach(clip => mixer.clipAction(clip).play());
     }
   },
   undefined,
-  (err) => console.error("GLTF load error:", err)
+  function(err) { console.error('GLTF load error:', err); }
 );
 
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth/window.innerHeight;
+// Handle window resize
+window.addEventListener('resize', function() {
+  camera.aspect = container.clientWidth/container.clientHeight;
   camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(container.clientWidth, container.clientHeight);
 });
 
-function animate(){
+// Render loop
+function animate() {
   requestAnimationFrame(animate);
   const delta = clock.getDelta();
-  if(mixer) mixer.update(delta);
+  if (mixer) mixer.update(delta);
   controls.update();
   renderer.render(scene, camera);
 }
