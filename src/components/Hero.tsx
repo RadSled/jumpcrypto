@@ -1,44 +1,25 @@
-import React, { Suspense, useEffect, useRef, useState } from "react";
+import React, { Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
-import { Model } from "./Model";
-import gsap from "gsap";
+import { OrbitControls, useGLTF } from "@react-three/drei";
 
-export default function Hero() {
-  const [anim, setAnim] = useState(true);
-  const canvasRef = useRef<HTMLDivElement>(null);
+function Model() {
+  const gltf = useGLTF("/models/jump2.gltf");
+  return <primitive object={gltf.scene} />;
+}
 
-  useEffect(() => {
-    if (anim && canvasRef.current) {
-      const tl = gsap.timeline({ repeat: -1 });
-      tl.to(canvasRef.current, { opacity: 0, duration: 1 })
-        .to(canvasRef.current, { opacity: 1, duration: 1 });
-    }
-  }, [anim]);
-
+const Hero = () => {
   return (
-    <div
-      ref={canvasRef}
-      style={{ width: "100%", height: "100%", position: "relative" }}
-    >
-      <Canvas>
+    <div style={{ width: "100%", height: "600px" }}>
+      <Canvas camera={{ position: [0, 2, 5], fov: 50 }}>
         <ambientLight intensity={0.5} />
-        <directionalLight intensity={0.5} />
+        <directionalLight position={[5, 5, 5]} intensity={1} />
         <Suspense fallback={null}>
           <Model />
         </Suspense>
+        <OrbitControls />
       </Canvas>
-      <button
-        onClick={() => setAnim(!anim)}
-        style={{
-          position: "absolute",
-          bottom: 20,
-          right: 20,
-          padding: "10px 20px",
-          zIndex: 1,
-        }}
-      >
-        {anim ? "Pause" : "Play"}
-      </button>
     </div>
   );
-}
+};
+
+export default Hero;
