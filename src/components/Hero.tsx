@@ -21,7 +21,7 @@ const Model: React.FC<ModelProps> = ({ url, scale = 1, play = true }) => {
       group.current.add(gltf.scene);
       gltf.scene.scale.set(scale, scale, scale);
 
-      // Set original material colors (if needed)
+      // Ensure proper color
       gltf.scene.traverse((child: any) => {
         if (child.isMesh) {
           child.material.color = new Color(child.material.color.getHex());
@@ -62,17 +62,13 @@ const Hero: React.FC = () => {
   return (
     <div style={{ position: "relative", width: "100%", height: 600 }}>
       <Canvas
-        style={{
-          width: "100%",
-          height: "100%",
-          background: "#ffffff",
-        }}
+        style={{ width: "100%", height: "100%", background: "#ffffff" }}
         camera={{ position: [0, 1, 3], fov: 50 }}
       >
         <ambientLight intensity={0.6} />
         <directionalLight intensity={0.6} position={[2, 2, 2]} />
         <Suspense fallback={null}>
-          <Model url="/static/jump2.gltf" scale={isMobile ? 0.5 : 1} play={play} />
+          <Model url="/models/jump2.gltf" scale={isMobile ? 0.5 : 1} play={play} />
         </Suspense>
       </Canvas>
 
