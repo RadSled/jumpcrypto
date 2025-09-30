@@ -11,14 +11,16 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "@react-three/fiber": "^9.3.0",
-    "three": "^0.165.0",
-    "three-stdlib": "^2.20.0"
+    "@react-three/drei": "^9.56.0",
+    "three": "^0.156.0",
+    "@mui/material": "^5.15.0",
+    "@emotion/react": "^11.11.0",
+    "@emotion/styled": "^11.11.0",
+    "gsap": "^3.13.0"
   },
   "devDependencies": {
-    "@types/react": "^18.0.28",
-    "@types/react-dom": "^18.0.11",
-    "typescript": "^5.2.2",
     "vite": "^5.4.20",
-    "@vitejs/plugin-react": "^3.2.0"
+    "@vitejs/plugin-react": "^3.1.0",
+    "typescript": "^5.2.0"
   }
 }
