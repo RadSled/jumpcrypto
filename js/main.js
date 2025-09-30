@@ -1,52 +1,62 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.141.0/build/three.module.js';
 import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.141.0/examples/jsm/loaders/GLTFLoader.js';
-import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.141.0/examples/jsm/controls/OrbitControls.js';
 
-const container = document.getElementById('canvas-container');
-const width = container.clientWidth;
-const height = container.clientHeight;
-
+// Scene
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x000000);
 
-const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-camera.position.set(0, 1, 3);
+// Camera
+const camera = new THREE.PerspectiveCamera(
+  45,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  1000
+);
+camera.position.set(0, 1.5, 3);
 
+// Renderer
 const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(width, height);
-container.appendChild(renderer.domElement);
-
-// OrbitControls so you can rotate with mouse
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.getElementById('canvas-container').appendChild(renderer.domElement);
 
 // Lighting
-const light = new THREE.AmbientLight(0xffffff, 1);
-scene.add(light);
+const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+scene.add(ambientLight);
 
-// Loader
+// Load model
 const loader = new GLTFLoader();
+loader.load(
+  '/models/jump2.gltf', // Make sure the file is at /models/jump2.gltf
+  (gltf) => {
+    scene.add(gltf.scene);
 
-// Replace this with your base64 model
-const modelData = 'data:application/octet-stream;base64,AAAAAArXIz0K16M9j8L1PQrXIz7NzEw...'; // truncated
+    // Play animations if any
+    if (gltf.animations && gltf.animations.length) {
+      const mixer = new THREE.AnimationMixer(gltf.scene);
+      gltf.animations.forEach((clip) => mixer.clipAction(clip).play());
 
-loader.parse(atob(modelData.split(',')[1]), '', (gltf) => {
-    const model = gltf.scene;
-    model.scale.set(1,1,1);
-    scene.add(model);
-
-    const mixer = gltf.animations.length > 0 ? new THREE.AnimationMixer(model) : null;
-    if (mixer) {
-        gltf.animations.forEach((clip) => mixer.clipAction(clip).play());
-    }
-
-    const clock = new THREE.Clock();
-
-    function animate() {
+      const clock = new THREE.Clock();
+      const animate = function () {
         requestAnimationFrame(animate);
-        if (mixer) mixer.update(clock.getDelta());
-        controls.update();
+        mixer.update(clock.getDelta());
         renderer.render(scene, camera);
+      };
+      animate();
+    } else {
+      const animate = function () {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+      };
+      animate();
     }
-    animate();
+  },
+  undefined,
+  (error) => console.error('Error loading GLTF:', error)
+);
+
+// Handle resizing
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
 });
