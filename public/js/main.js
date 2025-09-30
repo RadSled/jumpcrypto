@@ -1,62 +1,49 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.141.0/build/three.module.js';
 import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.141.0/examples/jsm/loaders/GLTFLoader.js';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.141.0/examples/jsm/controls/OrbitControls.js';
 
-// Scene
+const container = document.getElementById('canvas-container');
+
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x000000);
+scene.background = new THREE.Color(0x202020);
 
-// Camera
-const camera = new THREE.PerspectiveCamera(
-  45,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  1000
-);
-camera.position.set(0, 1.5, 3);
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.set(0, 2, 5);
 
-// Renderer
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
-document.getElementById('canvas-container').appendChild(renderer.domElement);
+container.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
 
 // Lighting
-const ambientLight = new THREE.AmbientLight(0xffffff, 1);
-scene.add(ambientLight);
+const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+scene.add(ambient);
+
+const directional = new THREE.DirectionalLight(0xffffff, 0.8);
+directional.position.set(5, 10, 7.5);
+scene.add(directional);
 
 // Load model
 const loader = new GLTFLoader();
-loader.load(
-  '/models/jump2.gltf', // Make sure the file is at /models/jump2.gltf
-  (gltf) => {
+loader.load('/models/jump2.gltf', gltf => {
     scene.add(gltf.scene);
-
-    // Play animations if any
-    if (gltf.animations && gltf.animations.length) {
-      const mixer = new THREE.AnimationMixer(gltf.scene);
-      gltf.animations.forEach((clip) => mixer.clipAction(clip).play());
-
-      const clock = new THREE.Clock();
-      const animate = function () {
-        requestAnimationFrame(animate);
-        mixer.update(clock.getDelta());
-        renderer.render(scene, camera);
-      };
-      animate();
-    } else {
-      const animate = function () {
-        requestAnimationFrame(animate);
-        renderer.render(scene, camera);
-      };
-      animate();
-    }
-  },
-  undefined,
-  (error) => console.error('Error loading GLTF:', error)
-);
-
-// Handle resizing
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+}, undefined, error => {
+    console.error('Error loading model:', error);
 });
+
+// Resize
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// Animation loop
+function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+}
+animate();
