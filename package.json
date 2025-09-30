@@ -3,22 +3,19 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "gatsby develop",
-    "build": "gatsby build",
-    "serve": "gatsby serve"
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "@react-three/fiber": "8.13.0",
+    "@react-three/fiber": "^9.3.0",
     "three": "^0.156.1",
-    "gsap": "^3.12.2",
-    "gatsby": "^5.5.0",
-    "gatsby-plugin-image": "^4.8.0",
-    "gatsby-plugin-breakpoints": "^2.1.1",
-    "@mui/material": "^5.14.0"
+    "gsap": "^3.12.2"
   },
   "devDependencies": {
-    "typescript": "^5.2.0"
+    "@vitejs/plugin-react": "^4.0.0",
+    "vite": "^5.0.0"
   }
 }
