@@ -12,7 +12,7 @@ const Model: React.FC = () => {
     loader.load("/models/jump2.gltf", (gltf) => {
       if (!group.current) return;
       group.current.add(gltf.scene);
-      gltf.scene.scale.set(1, 1, 1);
+      gltf.scene.scale.set(0.5, 0.5, 0.5); // adjust size
 
       if (gltf.animations.length > 0) {
         mixer.current = new AnimationMixer(gltf.scene);
