@@ -1,8 +1,12 @@
-import React from "react";
-import Hero from "./components/Hero";
+import React from 'react';
+import Hero from './components/Hero';
 
 function App() {
-  return <Hero />;
+  return (
+    <div style={{ width: '100vw', height: '100vh' }}>
+      <Hero />
+    </div>
+  );
 }
 
 export default App;
